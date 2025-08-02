@@ -1,8 +1,26 @@
 import Image from "next/image";
+import pool from "@/lib/db";
 
 export const dynamic = 'force-dynamic';
 
-export default function Home() {
+async function getDbTime() {
+  try {
+    const { rows } = await pool.query('SELECT NOW()');
+    // Format the time to be more readable    
+    return new Date(rows[0].now).toString();
+  } catch (error) {
+    console.error("Database query failed:", error);
+    // Check for specific properties if the error object is not a standard Error
+    if (error instanceof Error) {
+      return `DB Error: ${error.message}`;
+    }
+    return "DB Error: An unknown error occurred";
+  }
+}
+
+export default async function Home() {
+  const dbTime = await getDbTime();
+
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
@@ -17,7 +35,7 @@ export default function Home() {
         <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
           <li className="mb-2 tracking-[-.01em]">
             Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
+            <code className="bg-gray-200 dark:bg-gray-700 font-mono font-semibold px-1 py-0.5 rounded">
               src/app/page.tsx
             </code>
             .
@@ -25,8 +43,9 @@ export default function Home() {
           <li className="tracking-[-.01em]">
             Save and see your changes instantly.
           </li>
-          <li>CI/CD with connect github repository to cloud run</li>
-          <li>App Version: {process.env.APP_VERSION || "N/A"}</li>
+          <li>[POC] CI/CD with connect github repository to cloud run</li>
+          <li>[POC] Secret Manager. APP_VERSION: <code className="bg-gray-200 dark:bg-gray-700 font-mono font-semibold px-1 py-0.5 rounded">{process.env.APP_VERSION || "N/A"}</code></li>
+          <li>[POC] CLoud SQL Connection. DB Times: <code className="bg-gray-200 dark:bg-gray-700 font-mono font-semibold px-1 py-0.5 rounded">{dbTime}</code></li>
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
