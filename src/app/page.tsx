@@ -1,5 +1,7 @@
 import Image from "next/image";
 
+export const dynamic = 'force-dynamic';
+
 export default function Home() {
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
@@ -24,6 +26,7 @@ export default function Home() {
             Save and see your changes instantly.
           </li>
           <li>CI/CD with connect github repository to cloud run</li>
+          <li>App Version: {process.env.APP_VERSION || "N/A"}</li>
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
