@@ -3,6 +3,7 @@ import { Storage } from '@google-cloud/storage';
 import Image from 'next/image';
 
 const bucketName = process.env.GCS_BUCKET_NAME || 'thailandpenthouses-cms-media';
+const cdnDomain = process.env.CDN_DOMAIN || 'thailandpenthouses-cdn.digi-team.work';
 
 const storage = new Storage({
   projectId: process.env.GCP_PROJECT_ID || 'sc-thailandpenthouses-uat',
@@ -23,9 +24,11 @@ async function getGcsFiles() {
   try {
     const [files] = await storage.bucket(bucketName).getFiles();
 
+    // Switched to use the CDN domain for serving images for better performance.
     const fileDetails = files.map(file => ({
       name: file.name,
-      url: `https://storage.googleapis.com/${bucketName}/${encodeURIComponent(file.name)}`,
+      // URL now points to the configured Cloud CDN domain
+      url: `https://${cdnDomain}/${encodeURIComponent(file.name)}`,
       size: file.metadata.size ? parseInt(String(file.metadata.size), 10) : 0,
     }));
     
