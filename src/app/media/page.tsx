@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Storage } from '@google-cloud/storage';
-import Image from 'next/image';
+import MediaGrid from './MediaGrid'; // Import the new client component
 
 const bucketName = process.env.GCS_BUCKET_NAME || 'thailandpenthouses-cms-media';
 const cdnDomain = process.env.CDN_DOMAIN || 'thailandpenthouses-cdn.digi-team.work';
@@ -9,36 +9,36 @@ const storage = new Storage({
   projectId: process.env.GCP_PROJECT_ID || 'sc-thailandpenthouses-uat',
 });
 
+// We force this page to be dynamic to ensure it fetches the latest file list on each visit.
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
-function formatBytes(bytes: number, decimals = 2) {
-  if (!bytes || bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
+type FileDetail = {
+  name: string;
+  url: string;
+  size: number;
+};
 
-async function getGcsFiles() {
+async function getGcsFiles(): Promise<FileDetail[]> {
   try {
     const [files] = await storage.bucket(bucketName).getFiles();
 
-    // Switched to use the CDN domain for serving images for better performance.
     const fileDetails = files.map(file => ({
       name: file.name,
-      // URL now points to the configured Cloud CDN domain
       url: `https://${cdnDomain}/${encodeURIComponent(file.name)}`,
       size: file.metadata.size ? parseInt(String(file.metadata.size), 10) : 0,
     }));
     
-    return fileDetails;
+    // Sort by name for consistent ordering
+    return fileDetails.sort((a, b) => a.name.localeCompare(b.name));
+
   } catch (error) {
     console.error('Failed to list files from GCS:', error);
     return [];
   }
 }
 
+// This remains a Server Component responsible for data fetching.
 export default async function MediaPage() {
   const files = await getGcsFiles();
 
@@ -57,36 +57,10 @@ export default async function MediaPage() {
       </div>
 
       <h2 className="text-2xl font-semibold mb-4">Image Gallery</h2>
-      {/* Updated Grid: Max 6 columns on large screens */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-        {files.length > 0 ? (
-          files.map(file => (
-            <div key={file.name} className="border border-gray-300 rounded-lg p-2 shadow-sm flex flex-col justify-between bg-white">
-              <div className="relative aspect-square w-full overflow-hidden rounded-md mb-2">
-                <Image
-                  src={file.url}
-                  alt={file.name}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16.6vw"
-                  style={{ objectFit: 'cover' }}
-                  unoptimized
-                />
-              </div>
-              <div className="text-xs">
-                {/* Updated Text Contrast: Darker text for better readability */}
-                <p className="font-semibold text-gray-900 truncate" title={file.name}>
-                  {file.name}
-                </p>
-                <p className="text-gray-600">
-                  {formatBytes(file.size)}
-                </p>
-              </div>
-            </div>
-          ))
-        ) : (
-          <p className="col-span-full text-gray-500">No images found in the bucket. Ensure your local environment has permissions or check the bucket content.</p>
-        )}
-      </div>
+      
+      {/* The presentation logic is now delegated to the MediaGrid Client Component. */}
+      <MediaGrid files={files} />
+      
     </main>
   );
 }
