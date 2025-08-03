@@ -2,44 +2,39 @@ import Link from 'next/link';
 import { Storage } from '@google-cloud/storage';
 import Image from 'next/image';
 
-// This needs to be configured in your environment variables
 const bucketName = process.env.GCS_BUCKET_NAME || 'thailandpenthouses-cms-media';
 
 const storage = new Storage({
-  keyFilename: process.env.NODE_ENV !== 'production' ? 'service-account-key.json' : undefined,
+  projectId: process.env.GCP_PROJECT_ID || 'sc-thailandpenthouses-uat',
 });
 
-// We make the page dynamic to ensure it fetches the latest file list on each visit
 export const dynamic = 'force-dynamic';
+
+function formatBytes(bytes: number, decimals = 2) {
+  if (!bytes || bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
 
 async function getGcsFiles() {
   try {
     const [files] = await storage.bucket(bucketName).getFiles();
 
-    // Create signed URLs for each file for reading
-    const signedUrls = await Promise.all(
-      files.map(async (file) => {
-        const options = {
-          version: 'v4' as const,
-          action: 'read' as const,
-          expires: Date.now() + 60 * 60 * 1000, // 1 hour
-        };
-        const [url] = await file.getSignedUrl(options);
-        return {
-          name: file.name,
-          url: url,
-        };
-      })
-    );
+    const fileDetails = files.map(file => ({
+      name: file.name,
+      url: `https://storage.googleapis.com/${bucketName}/${encodeURIComponent(file.name)}`,
+      size: file.metadata.size ? parseInt(String(file.metadata.size), 10) : 0,
+    }));
     
-    return signedUrls;
+    return fileDetails;
   } catch (error) {
-    console.error('Failed to list files or create signed URLs from GCS:', error);
-    // Return an empty array or handle the error as needed
+    console.error('Failed to list files from GCS:', error);
     return [];
   }
 }
-
 
 export default async function MediaPage() {
   const files = await getGcsFiles();
@@ -51,36 +46,42 @@ export default async function MediaPage() {
           &larr; Back to Home
         </Link>
       </div>
-      <h1 className="text-4xl font-bold mb-8">Media Management</h1>
-      
-      <div className="mb-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-4xl font-bold">Media Management</h1>
         <Link href="/media/upload" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
           Upload New File
         </Link>
       </div>
 
       <h2 className="text-2xl font-semibold mb-4">Image Gallery</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {/* Updated Grid: Max 6 columns on large screens */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {files.length > 0 ? (
           files.map(file => (
-            <div key={file.name} className="relative aspect-square overflow-hidden rounded-lg shadow-lg">
-              <Image
-                src={file.url}
-                alt={file.name}
-                fill
-                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                style={{ objectFit: 'cover' }}
-                // It's good practice to provide width/height, but for a responsive grid, 'fill' is often better.
-                // For direct src, Next.js can't optimize images from arbitrary URLs without configuration.
-                unoptimized // Use this if you haven't configured the GCS domain in next.config.js
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 p-2 text-white text-xs truncate">
-                {file.name}
+            <div key={file.name} className="border border-gray-300 rounded-lg p-2 shadow-sm flex flex-col justify-between bg-white">
+              <div className="relative aspect-square w-full overflow-hidden rounded-md mb-2">
+                <Image
+                  src={file.url}
+                  alt={file.name}
+                  fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16.6vw"
+                  style={{ objectFit: 'cover' }}
+                  unoptimized
+                />
+              </div>
+              <div className="text-xs">
+                {/* Updated Text Contrast: Darker text for better readability */}
+                <p className="font-semibold text-gray-900 truncate" title={file.name}>
+                  {file.name}
+                </p>
+                <p className="text-gray-600">
+                  {formatBytes(file.size)}
+                </p>
               </div>
             </div>
           ))
         ) : (
-          <p>No images found in the bucket.</p>
+          <p className="col-span-full text-gray-500">No images found in the bucket. Ensure your local environment has permissions or check the bucket content.</p>
         )}
       </div>
     </main>
