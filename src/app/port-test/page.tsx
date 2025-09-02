@@ -241,6 +241,12 @@ export default function PortTestPage() {
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 mb-3">Network Info</h3>
                   <div className="space-y-3">
+                    {testResult.details.myIPAddress && (
+                      <div className="flex justify-between items-center py-2 px-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                        <span className="text-blue-700 font-medium">My IP Address:</span>
+                        <span className="text-blue-900 font-semibold">{testResult.details.myIPAddress}</span>
+                      </div>
+                    )}
                     {testResult.details.localAddress && (
                       <div className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded-lg">
                         <span className="text-gray-700 font-medium">Local Address:</span>

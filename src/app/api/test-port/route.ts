@@ -2,14 +2,33 @@ import { NextResponse } from 'next/server';
 import { Socket } from 'net';
 
 async function testConnection(host: string, port: number): Promise<any> {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     const socket = new Socket();
+    
+    // Get public IP address
+    let publicIP = 'Unknown';
+    try {
+      const response = await fetch('https://api.ipify.org?format=json');
+      const data = await response.json();
+      publicIP = data.ip;
+    } catch (error) {
+      // Fallback to alternative service
+      try {
+        const response = await fetch('https://httpbin.org/ip');
+        const data = await response.json();
+        publicIP = data.origin;
+      } catch (fallbackError) {
+        publicIP = 'Unable to fetch';
+      }
+    }
+    
     const result: any = {
       success: false,
       message: '',
       details: {
         host: host,
         port: port,
+        myIPAddress: publicIP,
         localAddress: '',
         remoteAddress: '',
         connectionType: '',
@@ -137,12 +156,30 @@ function parseSMTPCapabilities(lines: string[]): string[] {
 }
 
 export async function GET() {
+  // Get public IP address
+  let publicIP = 'Unknown';
+  try {
+    const response = await fetch('https://api.ipify.org?format=json');
+    const data = await response.json();
+    publicIP = data.ip;
+  } catch (error) {
+    // Fallback to alternative service
+    try {
+      const response = await fetch('https://httpbin.org/ip');
+      const data = await response.json();
+      publicIP = data.origin;
+    } catch (fallbackError) {
+      publicIP = 'Unable to fetch';
+    }
+  }
+
   return NextResponse.json({
     success: true,
     message: 'Port test API is working',
     details: {
       host: 'scasset-com.mail.protection.outlook.com',
       port: 25,
+      myIPAddress: publicIP,
       status: 'API endpoint ready'
     },
     timestamp: new Date().toISOString(),
