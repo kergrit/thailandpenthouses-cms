@@ -47,7 +47,7 @@ export default async function Home() {
           <li>[POC] Secret Manager. APP_VERSION: <code className="bg-gray-200 dark:bg-gray-700 font-mono font-semibold px-1 py-0.5 rounded">{process.env.APP_VERSION || "N/A"}</code></li>
           <li>[POC] CLoud SQL Connection. DB Times: <code className="bg-gray-200 dark:bg-gray-700 font-mono font-semibold px-1 py-0.5 rounded">{dbTime}</code></li>
           <li><a href="/media" className="text-blue-500 hover:underline">[POC] Cloud Stroage / Cloud CDN. Go to Media Management</a></li>
-          <li><a href="/port25-test" className="text-blue-500 hover:underline">[POC] Port 25 Connection Test. Test SMTP Connection to Office 365</a></li>
+          <li><a href="/port-test" className="text-blue-500 hover:underline">[POC] Port Connection Test. Test connectivity to any server</a></li>
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
