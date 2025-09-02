@@ -7,23 +7,20 @@ interface PortTestResult {
   success: boolean;
   message: string;
   details: {
+    myIPAddress?: string;
     localAddress?: string;
     remoteAddress?: string;
     host?: string;
     port?: number;
     connectionType?: string;
     serverResponse?: string;
-    smtpCapabilities?: {
-      server: string;
-      features: string[];
-    };
-    error?: {
+    smtpCapabilities?: string[];
+    errorDetails?: {
       code: string;
       message: string;
-      type: string;
+      syscall: string;
     };
-    suggestion?: string;
-    recommendation?: string;
+    suggestions?: string[];
   };
   timestamp: string;
   project: string;

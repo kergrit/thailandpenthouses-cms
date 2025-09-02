@@ -1,7 +1,28 @@
 import { NextResponse } from 'next/server';
 import { Socket } from 'net';
 
-async function testConnection(host: string, port: number): Promise<any> {
+interface TestResult {
+  success: boolean;
+  message: string;
+  details: {
+    host: string;
+    port: number;
+    myIPAddress: string;
+    localAddress: string;
+    remoteAddress: string;
+    connectionType: string;
+    serverResponse: string;
+    smtpCapabilities: string[];
+    errorDetails: {
+      code: string;
+      message: string;
+      syscall: string;
+    } | null;
+    suggestions: string[];
+  };
+}
+
+async function testConnection(host: string, port: number): Promise<TestResult> {
   return new Promise(async (resolve) => {
     const socket = new Socket();
     
@@ -11,18 +32,18 @@ async function testConnection(host: string, port: number): Promise<any> {
       const response = await fetch('https://api.ipify.org?format=json');
       const data = await response.json();
       publicIP = data.ip;
-    } catch (error) {
+    } catch {
       // Fallback to alternative service
       try {
         const response = await fetch('https://httpbin.org/ip');
         const data = await response.json();
         publicIP = data.origin;
-      } catch (fallbackError) {
+      } catch {
         publicIP = 'Unable to fetch';
       }
     }
     
-    const result: any = {
+    const result: TestResult = {
       success: false,
       message: '',
       details: {
@@ -102,7 +123,7 @@ async function testConnection(host: string, port: number): Promise<any> {
       result.details.errorDetails = {
         code: err.code || 'UNKNOWN',
         message: err.message,
-        syscall: err.syscall
+        syscall: err.syscall || 'unknown'
       };
       
       // Provide specific suggestions based on error
@@ -158,20 +179,20 @@ function parseSMTPCapabilities(lines: string[]): string[] {
 export async function GET() {
   // Get public IP address
   let publicIP = 'Unknown';
-  try {
-    const response = await fetch('https://api.ipify.org?format=json');
-    const data = await response.json();
-    publicIP = data.ip;
-  } catch (error) {
-    // Fallback to alternative service
-    try {
-      const response = await fetch('https://httpbin.org/ip');
+      try {
+      const response = await fetch('https://api.ipify.org?format=json');
       const data = await response.json();
-      publicIP = data.origin;
-    } catch (fallbackError) {
-      publicIP = 'Unable to fetch';
+      publicIP = data.ip;
+    } catch {
+      // Fallback to alternative service
+      try {
+        const response = await fetch('https://httpbin.org/ip');
+        const data = await response.json();
+        publicIP = data.origin;
+      } catch {
+        publicIP = 'Unable to fetch';
+      }
     }
-  }
 
   return NextResponse.json({
     success: true,
