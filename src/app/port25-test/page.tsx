@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import Link from 'next/link';
 
 interface Port25TestResult {
   success: boolean;
@@ -267,12 +268,12 @@ export default function Port25TestPage() {
                 >
                   🔄 Test Again
                 </button>
-                <a
+                <Link
                   href="/"
                   className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
                 >
                   🏠 Back to Home
-                </a>
+                </Link>
               </div>
             </div>
           </div>

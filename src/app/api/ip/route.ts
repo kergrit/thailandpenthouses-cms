@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     // ทดสอบการเชื่อมต่อออกไปยัง external service เพื่อดู IP ที่ขาออก
     const response = await fetch('https://api.ipify.org?format=json', {

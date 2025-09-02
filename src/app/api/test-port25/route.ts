@@ -5,9 +5,33 @@ export async function GET() {
   const host = 'scasset-com.mail.protection.outlook.com';
   const port = 25;
   
-  return new Promise((resolve) => {
+  return new Promise<NextResponse>((resolve) => {
     const client = new net.Socket();
-    let result = {
+    const result: {
+      success: boolean;
+      message: string;
+      details: {
+        localAddress?: string;
+        remoteAddress?: string;
+        host?: string;
+        port?: number;
+        connectionType?: string;
+        serverResponse?: string;
+        smtpCapabilities?: {
+          server: string;
+          features: string[];
+        };
+        error?: {
+          code: string;
+          message: string;
+          type: string;
+        };
+        suggestion?: string;
+        recommendation?: string;
+      };
+      timestamp: string;
+      project: string;
+    } = {
       success: false,
       message: '',
       details: {},
@@ -50,11 +74,11 @@ export async function GET() {
       }, 1000);
     });
     
-    client.on('error', (err) => {
+    client.on('error', (err: NodeJS.ErrnoException) => {
       clearTimeout(timeout);
       result.message = `Port 25 connection failed: ${err.message}`;
       result.details.error = {
-        code: err.code,
+        code: err.code || 'UNKNOWN',
         message: err.message,
         type: err.constructor.name
       };
@@ -90,9 +114,15 @@ export async function GET() {
 }
 
 // ฟังก์ชันสำหรับ parse SMTP capabilities
-function parseSMTPCapabilities(response: string): any {
+function parseSMTPCapabilities(response: string): {
+  server: string;
+  features: string[];
+} {
   const lines = response.split('\r\n').filter(line => line.trim());
-  const capabilities: any = {
+  const capabilities: {
+    server: string;
+    features: string[];
+  } = {
     server: '',
     features: []
   };
