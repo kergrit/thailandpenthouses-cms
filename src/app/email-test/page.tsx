@@ -171,16 +171,15 @@ export default function EmailTestPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    SMTP Password *
+                    SMTP Password
                   </label>
                   <input
                     type="password"
                     name="smtpPassword"
                     value={formData.smtpPassword}
                     onChange={handleInputChange}
-                    required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
-                    placeholder="Your SMTP password"
+                    placeholder="Your SMTP password (optional)"
                   />
                 </div>
 
@@ -319,10 +318,10 @@ export default function EmailTestPage() {
               </h3>
               
               <div className="space-y-2 text-sm">
-                <p><strong>Error:</strong> {error.error}</p>
-                <p><strong>Message:</strong> {error.message}</p>
-                <p><strong>Outbound IP:</strong> {error.outboundIp}</p>
-                <p><strong>Timestamp:</strong> {new Date(error.timestamp).toLocaleString('th-TH')}</p>
+                <p className="text-gray-800"><strong className="text-gray-900">Error:</strong> <span className="text-gray-700">{error.error}</span></p>
+                <p className="text-gray-800"><strong className="text-gray-900">Message:</strong> <span className="text-gray-700">{error.message}</span></p>
+                <p className="text-gray-800"><strong className="text-gray-900">Outbound IP:</strong> <span className="text-gray-700">{error.outboundIp}</span></p>
+                <p className="text-gray-800"><strong className="text-gray-900">Timestamp:</strong> <span className="text-gray-700">{new Date(error.timestamp).toLocaleString('th-TH')}</span></p>
               </div>
             </div>
           )}
@@ -338,6 +337,7 @@ export default function EmailTestPage() {
               <p><strong>SMTP Ports:</strong> 25 (Standard), 587 (STARTTLS), 465 (SSL/TLS)</p>
               <p><strong>Office 365:</strong> smtp.office365.com:587 (STARTTLS)</p>
               <p><strong>Gmail:</strong> smtp.gmail.com:587 (STARTTLS)</p>
+              <p><strong>Port 25:</strong> Standard SMTP port, no authentication required</p>
               <p><strong>Security:</strong> Use app passwords for Gmail, enable 2FA first</p>
             </div>
           </div>

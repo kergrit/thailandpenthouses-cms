@@ -18,10 +18,10 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Validate required fields
-    if (!to || !subject || !message || !smtpHost || !smtpPort || !smtpUser || !smtpPassword) {
+    if (!to || !subject || !message || !smtpHost || !smtpPort || !smtpUser) {
       return NextResponse.json({
         error: 'Missing required fields',
-        required: ['to', 'subject', 'message', 'smtpHost', 'smtpPort', 'smtpUser', 'smtpPassword']
+        required: ['to', 'subject', 'message', 'smtpHost', 'smtpPort', 'smtpUser']
       }, { status: 400 });
     }
 
@@ -30,10 +30,10 @@ export async function POST(request: NextRequest) {
       host: smtpHost,
       port: parseInt(smtpPort),
       secure: smtpSecure === 'true' || smtpPort === '465',
-      auth: {
+      auth: smtpPassword ? {
         user: smtpUser,
         pass: smtpPassword,
-      },
+      } : undefined,
       // Add connection timeout
       connectionTimeout: 10000,
       greetingTimeout: 10000,
