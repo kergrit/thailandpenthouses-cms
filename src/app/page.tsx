@@ -49,6 +49,7 @@ export default async function Home() {
           <li><a href="/media" className="text-blue-500 hover:underline">[POC] Cloud Stroage / Cloud CDN. Go to Media Management</a></li>
           <li><a href="/port-test" className="text-blue-500 hover:underline">[POC] Port Connection Test. Test connectivity to any server</a></li>
           <li><a href="/ip-check" className="text-blue-500 hover:underline">[POC] Outbound IP Check. Check Cloud Run outbound IP address</a></li>
+          <li><a href="/email-test" className="text-blue-500 hover:underline">[POC] Email Test. Test SMTP email sending with various configurations</a></li>
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
