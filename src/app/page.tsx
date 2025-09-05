@@ -48,6 +48,7 @@ export default async function Home() {
           <li>[POC] CLoud SQL Connection. DB Times: <code className="bg-gray-200 dark:bg-gray-700 font-mono font-semibold px-1 py-0.5 rounded">{dbTime}</code></li>
           <li><a href="/media" className="text-blue-500 hover:underline">[POC] Cloud Stroage / Cloud CDN. Go to Media Management</a></li>
           <li><a href="/port-test" className="text-blue-500 hover:underline">[POC] Port Connection Test. Test connectivity to any server</a></li>
+          <li><a href="/ip-check" className="text-blue-500 hover:underline">[POC] Outbound IP Check. Check Cloud Run outbound IP address</a></li>
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
