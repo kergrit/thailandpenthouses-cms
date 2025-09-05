@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 interface IpCheckResult {
   outboundIp: string;
@@ -288,12 +289,12 @@ export default function IpCheckPage() {
           </div>
 
           <div className="mt-6 text-center">
-            <a 
+            <Link 
               href="/" 
               className="text-blue-500 hover:underline"
             >
               ← กลับไปหน้าแรก
-            </a>
+            </Link>
           </div>
         </div>
       </div>
